@@ -1,6 +1,6 @@
 {
     "name": "Project.Presentation",
-    "rootNamespace": "",
+    "rootNamespace": "TurnBasedCombat.Presentation",
     "references": [
         "GUID:01954308c64b5ef4aaceb68f2f559b20",
         "GUID:f49d4a0765684964ba77f0d79762e57b",
