@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using TurnBasedCombat.Core;
 using UnityEngine;
 
@@ -19,7 +20,7 @@ namespace TurnBasedCombat.Gamplay
             _commandQueue.Enqueue(command);
         }
 
-        public async void ExecuteAllAsync(CancellationToken ct) 
+        public async UniTask ExecuteAllAsync(CancellationToken ct) 
         {
             if (_isProcessing) return;
             _isProcessing = true;
