@@ -12,6 +12,9 @@ namespace TurnBasedCombat.Infrastructure
             Container.Bind<IAddressableProvider>().To<AddressableProvider>().AsSingle();
 
             Container.Bind<CommandProcessor>().AsSingle();
+
+            // Biniding the Orchestrator
+            Container.BindInterfacesAndSelfTo<CombatOrchestrator>().AsSingle();
         }
     }
 }
