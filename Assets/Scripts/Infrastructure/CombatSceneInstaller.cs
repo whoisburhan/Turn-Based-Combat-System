@@ -1,5 +1,6 @@
 using TurnBasedCombat.Core;
 using TurnBasedCombat.Gamplay;
+using TurnBasedCombat.Presentation;
 using UnityEngine;
 using Zenject;
 
@@ -15,6 +16,8 @@ namespace TurnBasedCombat.Infrastructure
 
             // Biniding the Orchestrator
             Container.BindInterfacesAndSelfTo<CombatOrchestrator>().AsSingle();
+
+            Container.Bind<UnitFactory>().AsSingle();
         }
     }
 }
