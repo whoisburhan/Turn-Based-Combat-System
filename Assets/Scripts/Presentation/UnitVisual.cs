@@ -37,9 +37,25 @@ namespace TurnBasedCombat.Presentation
             _animator.SetBool("IsMoving", false);
         }
 
-        public UniTask PlayAnimationAsync(string triggerName, CancellationToken ct)
+        public async UniTask PlayAnimationAsync(string triggerName, CancellationToken ct)
         {
-            throw new System.NotImplementedException();
+            ct.ThrowIfCancellationRequested();
+            _animator.SetTrigger(triggerName);
+
+            await UniTask.Yield(PlayerLoopTiming.Update, ct); // Wait a frame for the animation to start
+
+            var isInTransition = _animator.IsInTransition(0);
+
+            var stateInfo = isInTransition? _animator.GetNextAnimatorStateInfo(0) :  _animator.GetCurrentAnimatorStateInfo(0);
+
+
+            float runTimeSpeed = stateInfo.speed > 0 ? stateInfo.speed : 1f; // preventing zero or negative speed which would cause infinite wait
+            float globalSpeed = _animator.speed > 0 ? _animator.speed : 1f;
+
+            float clipDuration = stateInfo.length / (runTimeSpeed * globalSpeed);
+            await UniTask.Delay((int)(clipDuration * 1000), cancellationToken:ct );
+
+
         }
     }
 }
