@@ -17,6 +17,8 @@ namespace TurnBasedCombat.Infrastructure
             // Biniding the Orchestrator
             Container.BindInterfacesAndSelfTo<CombatOrchestrator>().AsSingle();
 
+            Container.Bind<UnitVisualFactory>().AsSingle();
+            Container.Bind<HealthBarFactory>().AsSingle();
             Container.Bind<UnitFactory>().AsSingle();
         }
     }

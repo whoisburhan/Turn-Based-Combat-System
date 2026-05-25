@@ -11,18 +11,20 @@ namespace TurnBasedCombat.Gamplay
         public int CurrentHp { get; private set; }
         public Vector2Int GridPosition { get; private set; }
 
+        public UnitFactions Faction { get; }
 
         public event Action<int> OnHpChanged;
         public event Action<Vector2Int> OnPositionChanged;
         public event Action OnUnitDied;
 
-        public UnitModel(string id, string name, int maxHp, Vector2Int startingPosition) 
+        public UnitModel(string id, string name, int maxHp, Vector2Int startingPosition, UnitFactions faction) 
         {
             Id = id;
             Name = name;
             MaxHp = maxHp;
             CurrentHp = maxHp;
             GridPosition = startingPosition;
+            Faction = faction;
         }
 
         public void SetPosition(Vector2Int newPosition) 

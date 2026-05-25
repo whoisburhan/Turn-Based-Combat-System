@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using System.Threading;
 using TurnBasedCombat.Core;
+using TurnBasedCombat.Gamplay;
 using UnityEngine;
 using Zenject;
 
@@ -8,33 +9,46 @@ namespace TurnBasedCombat.Presentation
 {
     public class UnitFactory
     {
-        private readonly DiContainer _container;
-        private readonly IAddressableProvider _addressableProvider;
+        private readonly UnitVisualFactory _unitVisualFactory;
+        private readonly HealthBarFactory _uiFactory;
 
-        public UnitFactory(DiContainer container, IAddressableProvider addressableProvider) 
+        private readonly Transform _playerHudParent;
+        private readonly Transform _enemyHudParent;
+
+
+        
+        public UnitFactory(
+            UnitVisualFactory unitVisualFactory, 
+            HealthBarFactory uiFactory, 
+            [Inject(Id = "PlayerHudParent")] Transform playerHudParent, 
+            [Inject(Id = "EnemyHudParent")] Transform enemyHudParent)
         {
-            _container = container;
-            _addressableProvider = addressableProvider;
+            _unitVisualFactory = unitVisualFactory;
+            _uiFactory = uiFactory;
+            _playerHudParent = playerHudParent;
+            _enemyHudParent = enemyHudParent;
         }
 
-        public async UniTask<UnitVisual> CreateUnitAsync(string addressableKey, Vector2Int spawnGridPos, CancellationToken ct) 
+        public async UniTask<(UnitVisual visual, UnitPresenter presenter)> CreateUnitContextAsync(
+            string visualKey,
+            string uiKey,
+            Vector2Int spawnGridPos,
+            UnitModel underlyingModel,
+            CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
-            // 1.Fetch the prefab from the addressable system
-            GameObject prefab = await _addressableProvider.LoadAssetAsync<GameObject>(addressableKey, ct);
 
-            Vector3 spawnWorldPos = new Vector3(spawnGridPos.x, spawnGridPos.y, 0);
+            Transform targetUiParent = underlyingModel.Faction == UnitFactions.Player ? _playerHudParent : _enemyHudParent;
 
-            // 2. Instantiate via zenject to maintain contextual container rules
-            GameObject unitInstance = _container.InstantiatePrefab(prefab, spawnWorldPos, Quaternion.identity, null);
+            var visual = _unitVisualFactory.CreateVisualAsync(visualKey, spawnGridPos, ct);
+            var ui = _uiFactory.CreateHealthBarAsync(uiKey, targetUiParent, ct);
 
-            if(unitInstance.TryGetComponent<UnitVisual>(out var unitVisual)) 
-            {
-                return unitVisual;
-            }
+            var (unitVisual, healthBarView) = await UniTask.WhenAll(visual, ui);
 
-            Debug.LogError($"[UnitFactory] The prefab at address '{addressableKey}' does not contain a UnitVisual component.");
-            return null;
+            UnitPresenter presenter = new UnitPresenter(healthBarView, underlyingModel);
+            presenter.Initialize();
+
+            return (unitVisual, presenter);
         }
     }
 }
