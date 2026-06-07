@@ -547,8 +547,8 @@ The documentation focuses on:
 
 ## 👤 Author
 
-Created by **Burhan Uddin**
-Senior Unity Gameplay Programmer
+Created by **Burhan Uddin**<br>
+Game Programmer
 
 * GitHub: https://github.com/whoisburhan
 * Portfolio: https://fantasyrealms.itch.io/
